@@ -1,4 +1,5 @@
 # Lean 4 Formalization: Clark Kimberling's Harmonic-Mean Conjectures (OEIS A227012 & General Integer Cubics)
+[[https://github.com/rajdeepbaror/kimberling-a227012-lean/actions/workflows/lean_action_ci.yml/badge.svg]](https://github.com/rajdeepbaror/kimberling-a227012-lean/actions/workflows/lean_action_ci.yml)
 
 This repository contains a complete, zero-`sorry` **Lean 4** formalization (with Mathlib4) and accompanying mathematical manuscript resolving:
 
