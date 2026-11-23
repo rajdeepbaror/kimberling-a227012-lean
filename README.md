@@ -3,7 +3,9 @@
 This repository contains a complete, zero-`sorry` **Lean 4** formalization (with Mathlib4) and accompanying mathematical manuscript resolving:
 
 1. **All four conjectured formulas on [OEIS A227012](https://oeis.org/A227012)** (Clark Kimberling, July 1, 2013; F. M. Ramaharo, April 12, 2018), where
-   $$a(n) = \left\lfloor M\!\left((n-1)^3 + 1, \dots, n^3\right) \right\rfloor$$
+
+   $$a(n) = \left\lfloor M\left((n-1)^3 + 1, \dots, n^3\right) \right\rfloor$$
+
    and $M$ denotes the harmonic mean.
 2. **Clark Kimberling's General Cubic Recurrence Conjecture** (Case 3 in the Comments of [OEIS A227012](https://oeis.org/A227012)) for *every* integer cubic $g(n) = an^3 + bn^2 + cn + d$ ($a > 0$), including the **exact minimal eventual recurrence order classification** (Corollary 8), which also resolves the conjectured eventual order-7 recurrence on [OEIS A227015](https://oeis.org/A227015).
 
@@ -15,8 +17,8 @@ All 12 exported theorems compile cleanly under `leanprover/lean4:v4.37.0-rc1` wi
 | :--- | :--- | :--- |
 | `A227012.lean` | `OEIS_A227012.a227012_ramaharo` | Ramaharo's explicit closed form for $a(n)$ for all $n \ge 1$ |
 | `A227012.lean` | `OEIS_A227012.a227012_trig` | Trigonometric formula for $a(n)$ for all $n \ge 1$ |
-| `A227012.lean` | `OEIS_A227012.a227012_recurrence` | Exact order-7 linear recurrence $(3, -3, 1, 1, -3, 3, -1)$ for $n \ge 8$ |
-| `A227012.lean` | `OEIS_A227012.a227012_gf` | Exact rational generating function identity in $\mathbb{Q}\llbracket X \rrbracket$ |
+| `A227012.lean` | `OEIS_A227012.a227012_recurrence` | Exact order-7 linear recurrence $(3, -3, 1, 1, -3, 3, -1)$ for $n \ge 10$ |
+| `A227012.lean` | `OEIS_A227012.a227012_gf` | Exact rational generating function identity in $\mathbb{Z}[[X]]$ |
 | `GeneralCubic.lean` | `GeneralCubic.IntCubic.nonvanishing_c1_c2_c3` | Non-vanishing of $(c_1, c_2, c_3)$ for integer cubics ($c_1 = c_2 = 0 \implies c_3 = \frac{9a^2+350}{4200a} > 0$) |
 | `GeneralCubic.lean` | `GeneralCubic.IntCubic.nonvanishing_c1_c2_c3_real` | Full real-coefficient Lemma 7 for all $a > 0$, $b,c,d \in \mathbb{R}$ |
 | `GeneralCubic.lean` | `GeneralCubic.IntCubic.M_g_asymptotic_limit` | Asymptotic expansion $u^3(M_g(n) - P_g(n) - c_1/u - c_2/u^2) \to c_3$ ($u = n - \frac{1}{2}$) |
@@ -31,7 +33,7 @@ All 12 exported theorems compile cleanly under `leanprover/lean4:v4.37.0-rc1` wi
 Requires [elan](https://github.com/leanprover/elan) (the Lean 4 toolchain manager).
 
 ```bash
-git clone <your-repo-url>
+git clone [https://github.com/rajdeepbaror/kimberling-a227012-lean.git](https://github.com/rajdeepbaror/kimberling-a227012-lean.git)
 cd kimberling-a227012-lean
 lake exe cache get
 lake build
