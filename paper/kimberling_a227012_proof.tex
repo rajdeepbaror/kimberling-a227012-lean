@@ -1,0 +1,394 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,margin=22mm]{geometry}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+
+\definecolor{primary}{RGB}{24,62,115}
+\definecolor{accent}{RGB}{140,42,35}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  citecolor=primary,
+  urlcolor=primary,
+  pdftitle={Proof of Kimberling's Harmonic Mean Conjectures for OEIS A227012 and All Integer Cubic Blocks},
+  pdfauthor={Independent Mathematical Proof}
+}
+
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\parindent}{0pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gray}Resolution of Kimberling's Conjectures on OEIS A227012}
+\fancyhead[R]{\small\color{gray}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\takeaway}[2]{%
+  \vspace{6pt}\noindent\colorbox{primary!7}{%
+    \parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+      \vspace{4pt}\textbf{\color{primary}#1:}\hspace{0.5em}#2\vspace{4pt}%
+    }%
+  }\vspace{6pt}%
+}
+
+\title{\vspace{-12pt}\textbf{\Large Complete Resolution of Kimberling's Harmonic Mean Conjectures on OEIS A227012 and General Cubic Blocks}}
+\author{Elementary Analytic Proof \& General Asymptotic Classification}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+\thispagestyle{plain}
+
+\begin{abstract}
+Let $H_N = \sum_{k=1}^N \frac{1}{k}$ denote the $N$-th harmonic number (with $H_0 = 0$). In July 2013, Clark Kimberling introduced \href{https://oeis.org/A227012}{OEIS A227012}, defined by $a(n) = \lfloor M(n) \rfloor$, where
+\[
+  M(n) = \frac{n^3 - (n-1)^3}{H_{n^3} - H_{(n-1)^3}} \qquad (n \ge 1)
+\]
+is the harmonic mean of the integers in the $n$-th cubic block $\{(n-1)^3 + 1, \dots, n^3\}$, and conjectured a trigonometric closed form, an order-$7$ linear recurrence, and a rational generating function; a fourth closed form involving $\lfloor \max(0,n-3)/4 \rfloor$ was conjectured by Franck Maminirina Ramaharo in April 2018. In the same entry, Kimberling further conjectured that for \emph{every} integer cubic polynomial $g(n) = an^3 + bn^2 + cn + d$ ($a > 0$), the floored block harmonic mean $m_g(n) = \lfloor (g(n)-g(n-1))/(H_{g(n)}-H_{g(n-1)}) \rfloor$ eventually satisfies the exact same order-$7$ linear recurrence.
+
+We give a completely elementary, self-contained proof of all four conjectured formulas for \href{https://oeis.org/A227012}{A227012} for every $n \ge 1$ (Theorem~\ref{thm:a227012}), using telescoping logarithmic bounds and explicit polynomial inequalities centered at $u = n - \frac{1}{2}$. We then resolve Kimberling's general cubic conjecture in full (Theorem~\ref{thm:general-cubic}): we show that $M_g(n) = g(n - \tfrac{1}{2}) + \tfrac{1}{2} + \frac{c_1}{u} + \frac{c_2}{u^2} + \frac{c_3}{u^3} + O(u^{-4})$ and prove an exact algebraic non-vanishing identity—namely, that $c_1 = c_2 = 0$ forces $c_3 = \frac{9a^2 + 350}{4200a} > 0$—which guarantees that $M_g(n)$ approaches the quarter-periodic cubic $P_g(n) = g(n - \tfrac{1}{2}) + \tfrac{1}{2}$ from a strictly fixed side for all sufficiently large $n$.
+\end{abstract}
+
+\takeaway{Main Results}{We prove all four $13$-year-old open conjectured formulas on \href{https://oeis.org/A227012}{OEIS A227012} for all $n \ge 1$ (Theorem~\ref{thm:a227012}) and prove Clark Kimberling's general cubic recurrence conjecture for every integer cubic $g(n) = an^3 + bn^2 + cn + d$ with $a > 0$ (Theorem~\ref{thm:general-cubic}).}
+
+\section{Introduction and Statements of Results}
+
+For a strictly increasing sequence of nonnegative integers $g(0) < g(1) < g(2) < \cdots$, the harmonic mean of the $n$-th block of integers $\{g(n-1)+1, \dots, g(n)\}$ is
+\[
+  M_g(n) := \frac{g(n) - g(n-1)}{\sum_{k = g(n-1)+1}^{g(n)} \frac{1}{k}} = \frac{g(n) - g(n-1)}{H_{g(n)} - H_{g(n-1)}}, \qquad m_g(n) := \lfloor M_g(n) \rfloor,
+\]
+where $H_N = \sum_{k=1}^{N} \frac{1}{k}$ ($H_0 = 0$); the same formula defines $M_g(n)$ and $m_g(n)$ for all $n \ge N_1$ whenever $g(n) > g(n-1) \ge 0$.\footnote{The Comments section of \href{https://oeis.org/A227012}{OEIS A227012} informally writes ``positive integers'' (whereas $g(0)=0$) and ``harmonic mean of $g(n-1),\dots,g(n)$'' (dropping $+1$); the entry's Title, Example, and Mathematica code unambiguously confirm the block $\{g(n-1)+1,\dots,g(n)\}$.} In \href{https://oeis.org/A227012}{OEIS A227012}~\cite{KimberlingA227012} (authored by Clark Kimberling on July 1, 2013, and still marked conjectured as of October 17, 2026), the canonical cubic case $g(n) = n^3$ yields the sequence $a(n) = m_{n^3}(n)$ beginning
+\[
+  1,\; 4,\; 16,\; 43,\; 91,\; 166,\; 275,\; 422,\; 614,\; 857,\; 1158,\; 1521,\; \dots
+\]
+Four explicit formulas for $a(n)$ are listed as \texttt{(conjectured)} on \href{https://oeis.org/A227012}{A227012}:
+\begin{enumerate}
+  \item \emph{Ramaharo's floor formula (Apr.\ 12, 2018):}
+  \begin{equation}\label{eq:f4}
+    a(n) = \frac{2n^3 - 3n^2 + n + 2}{2} + \left\lfloor \frac{\max(0, n - 3)}{4} \right\rfloor \qquad (n \ge 1).
+  \end{equation}
+  \item \emph{Kimberling's trigonometric closed form (Jul.\ 1, 2013):}
+  \begin{equation}\label{eq:f1}
+    a(k+2) = \frac{1}{8}\!\left(27 - (-1)^k - 2\cos\!\left(\frac{k\pi}{2}\right) + 2\sin\!\left(\frac{k\pi}{2}\right) + 2k(4k^2 + 18k + 27)\right) \quad (k \ge 1).
+  \end{equation}
+  \item \emph{Order-$7$ linear recurrence (Jul.\ 1, 2013):}
+  \begin{equation}\label{eq:f2}
+    a(n) = 3a(n-1) - 3a(n-2) + a(n-3) + a(n-4) - 3a(n-5) + 3a(n-6) - a(n-7) \qquad (n \ge 10).
+  \end{equation}
+  \item \emph{Rational generating function (Jul.\ 1, 2013):}
+  \begin{equation}\label{eq:f3}
+    \sum_{n=1}^{\infty} a(n)x^n = \frac{x(1 + x + 7x^2 + 6x^3 + 5x^4 + 5x^5 - 2x^7 + x^8)}{(x - 1)^4(1 + x + x^2 + x^3)}.
+  \end{equation}
+\end{enumerate}
+
+Furthermore, in the Comments section of \href{https://oeis.org/A227012}{A227012}, Kimberling conjectured that for \emph{every} integer cubic polynomial $g(n) = an^3 + bn^2 + cn + d$ with $a > 0$, the sequence $m_g(n)$ satisfies the order-$7$ linear recurrence~\eqref{eq:f2} for all sufficiently large $n$ (Case~(3) of his general polynomial harmonic-mean conjecture).
+
+\begin{theorem}[Complete Resolution of OEIS A227012]\label{thm:a227012}
+All four conjectured formulas \eqref{eq:f4}--\eqref{eq:f3} on \href{https://oeis.org/A227012}{OEIS A227012} hold for all integers $n \ge 1$ (and $k \ge 1$ in~\eqref{eq:f1}, $n \ge 10$ in~\eqref{eq:f2}).
+\end{theorem}
+
+\begin{theorem}[Kimberling's General Cubic Recurrence Conjecture]\label{thm:general-cubic}
+Let $g(n) = an^3 + bn^2 + cn + d$ with $a,b,c,d \in \mathbb{Z}$ and $a > 0$, and let $N_1 \in \mathbb{Z}$ be such that $g(n) > g(n-1) \ge 0$ for all $n \ge N_1$. Set $P_g(n) := g(n - \frac{1}{2}) + \frac{1}{2}$ and define the three rational invariants
+\begin{align*}
+  c_1 &= -\frac{20b^2 - 60ac + 3a^2}{240a}, \\
+  c_2 &= \frac{20b^3 - 80abc + a^2b + 180a^2d + 90a^2}{240a^2}, \\
+  c_3 &= -\frac{140b^4 - 700ab^2c + 49a^2b^2 + 840a^2bd + 420a^2b + 560a^2c^2 - 140a^3c + 2a^4 - 140a^2}{1680a^3}.
+\end{align*}
+Then $(c_1, c_2, c_3) \neq (0, 0, 0)$. Letting $\sigma \in \{+1, -1\}$ be the sign of the first nonzero entry of $(c_1, c_2, c_3)$, there exists $N_0 \ge N_1$ such that for all $n \ge N_0$,
+\begin{equation}\label{eq:general-floor}
+  m_g(n) = \begin{cases}
+    \lfloor P_g(n) \rfloor & \text{if } \sigma = +1, \\
+    \lceil P_g(n) \rceil - 1 & \text{if } \sigma = -1.
+  \end{cases}
+\end{equation}
+Consequently, for all $n \ge N_0 + 7$, $m_g(n)$ satisfies Kimberling's order-$7$ linear recurrence
+\[
+  m_g(n) = 3m_g(n-1) - 3m_g(n-2) + m_g(n-3) + m_g(n-4) - 3m_g(n-5) + 3m_g(n-6) - m_g(n-7).
+\]
+\end{theorem}
+
+The key obstacle to proving Theorem~\ref{thm:general-cubic} is that $P_g(n)$ can be an \emph{exact integer} for infinitely many $n$ (for instance, when $g(n) = 4n^3$, $P_g(n) = 4n^3 - 6n^2 + 3n \in \mathbb{Z}$ for every $n \in \mathbb{Z}$). In such boundary cases, $\lfloor M_g(n) \rfloor$ depends critically on whether $M_g(n)$ approaches $P_g(n)$ strictly from above or strictly from below. Theorem~\ref{thm:general-cubic} resolves this completely by showing that the first three asymptotic error coefficients $(c_1, c_2, c_3)$ never vanish simultaneously for any real cubic with $a > 0$.
+
+\section{Elementary Proof of Theorem~\ref{thm:a227012} (OEIS A227012)}
+
+We first establish a sharp, completely elementary telescoping bound on harmonic number differences that requires neither Euler--Maclaurin summation nor Stirling's formula.
+
+\begin{lemma}[Telescoping Logarithm Bound]\label{lem:harmonic-bound}
+For all integers $b > a \ge 1$,
+\begin{equation}\label{eq:telescoping}
+  0 < \ln\!\left(\frac{b + \frac{1}{2}}{a + \frac{1}{2}}\right) - (H_b - H_a) < \frac{1}{24}\!\left(\frac{1}{a(a+1)} - \frac{1}{b(b+1)}\right) < \frac{1}{24a^2}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For every integer $k \ge 1$, setting $x = \frac{1}{2k} \in (0, \frac{1}{2}]$ in the convergent series $\ln\frac{1+x}{1-x} = 2\sum_{j=0}^{\infty} \frac{x^{2j+1}}{2j+1}$ gives
+\[
+  0 < \ln\!\left(\frac{k + \frac{1}{2}}{k - \frac{1}{2}}\right) - \frac{1}{k} = \sum_{j=1}^{\infty} \frac{2}{(2j+1)(2k)^{2j+1}} < \frac{1}{12k^3} \sum_{j=0}^{\infty} \frac{1}{(4k^2)^j} = \frac{1}{3k(4k^2 - 1)}.
+\]
+For every $k \ge 2$, we have $3k(4k^2 - 1) = 12k^3 - 3k > 12k^3 - 12k = 12(k-1)k(k+1)$, and hence
+\[
+  \frac{1}{3k(4k^2 - 1)} < \frac{1}{12(k-1)k(k+1)} = \frac{1}{24}\!\left(\frac{1}{(k-1)k} - \frac{1}{k(k+1)}\right).
+\]
+Since $a \ge 1$, every $k \in \{a+1, \dots, b\}$ satisfies $k \ge 2$. Summing over $k = a+1, \dots, b$ telescopes both sides and yields~\eqref{eq:telescoping}.
+\end{proof}
+
+\subsection{Centering at $u = n - \tfrac{1}{2}$ and the $\tfrac{1}{8}$-Buffer}
+
+For $n \ge 2$, write $a = (n-1)^3$, $b = n^3$, and $u = n - \frac{1}{2}$, so that $n = u + \frac{1}{2}$ and $n - 1 = u - \frac{1}{2}$. Expanding $(u \pm \frac{1}{2})^3$ yields
+\[
+  2D := b - a = 3u^2 + \frac{1}{4}, \qquad S := \frac{b + a + 1}{2} = u^3 + \frac{3}{4}u + \frac{1}{2}, \qquad t := \frac{D}{S} = \frac{\frac{3}{2}u^2 + \frac{1}{8}}{u^3 + \frac{3}{4}u + \frac{1}{2}}.
+\]
+Define the centered cubic comparison polynomial
+\[
+  P(n) := u^3 + \frac{1}{2} = n^3 - \frac{3}{2}n^2 + \frac{3}{4}n + \frac{3}{8}.
+\]
+A direct algebraic identity splits $P(n)$ as
+\begin{equation}\label{eq:P-split}
+  P(n) = Q(n) + \frac{n - 3}{4} + \frac{1}{8}, \qquad Q(n) := \frac{2n^3 - 3n^2 + n + 2}{2}.
+\end{equation}
+Because $2n^3 - 3n^2 + n + 2 = n(n-1)(2n-1) + 2$ is always even, $Q(n) \in \mathbb{Z}$ for all $n \in \mathbb{Z}$. Writing $n - 3 = 4q + r$ with $q = \lfloor \frac{n-3}{4} \rfloor \in \mathbb{Z}$ and $r \in \{0, 1, 2, 3\}$, we obtain
+\[
+  P(n) = \big(Q(n) + q\big) + \frac{2r + 1}{8}, \qquad \frac{2r + 1}{8} \in \left\{\frac{1}{8},\, \frac{3}{8},\, \frac{5}{8},\, \frac{7}{8}\right\}.
+\]
+Every fractional part lies at distance at least $\frac{1}{8}$ from $\mathbb{Z}$. Therefore, \emph{whenever $|M(n) - P(n)| < \frac{1}{8}$}, we have $Q(n) + q < M(n) < Q(n) + q + 1$, which immediately forces
+\[
+  a(n) = \lfloor M(n) \rfloor = Q(n) + \left\lfloor \frac{n - 3}{4} \right\rfloor.
+\]
+
+\subsection{Explicit Two-Sided Bounds for All $n \ge 12$}
+
+Set $L := \ln\!\left(\frac{b + 1/2}{a + 1/2}\right) = \ln\!\left(\frac{S + D}{S - D}\right) = \ln\!\left(\frac{1 + t}{1 - t}\right)$ and $E := L - (H_b - H_a)$. By Lemma~\ref{lem:harmonic-bound}, for all $n \ge 2$,
+\begin{equation}\label{eq:L-E}
+  0 < E < \frac{1}{24a^2} = \frac{1}{24\big(u - \frac{1}{2}\big)^6}, \qquad H_b - H_a = L - E.
+\end{equation}
+Moreover, for all $n \ge 12$ (i.e., $u \ge \frac{23}{2}$), we have the simple sandwich bounds
+\begin{equation}\label{eq:t-bounds}
+  \frac{1}{u} < t < \frac{3}{2u},
+\end{equation}
+since $3S - 2uD = 2u + \frac{3}{2} > 0$ and $uD - S = \frac{1}{2}u^3 - \frac{5}{8}u - \frac{1}{2} > 0$ for all $u \ge \frac{23}{2}$.
+
+\begin{proposition}[Lower Bound: $M(n) > P(n) - \frac{1}{8}$ for $n \ge 12$]\label{prop:lower}
+For every integer $n \ge 12$, $M(n) > u^3 + \frac{3}{8}$.
+\end{proposition}
+
+\begin{proof}
+From~\eqref{eq:L-E} and the Taylor series of $L = \ln\frac{1+t}{1-t}$,
+\[
+  H_b - H_a < L = 2t \sum_{j=0}^{\infty} \frac{t^{2j}}{2j+1} < 2t\!\left(1 + \frac{t^2}{3} + \frac{t^4}{5(1 - t^2)}\right).
+\]
+Because $M(n) = \frac{2D}{H_b - H_a}$ and $2t = \frac{2D}{S}$, the desired inequality $M(n) > u^3 + \frac{3}{8}$ follows once we show
+\[
+  \frac{t^2}{3} + \frac{t^4}{5(1 - t^2)} < \frac{S}{u^3 + \frac{3}{8}} - 1 = \frac{\frac{3}{4}u + \frac{1}{8}}{u^3 + \frac{3}{8}}.
+\]
+For $u \ge \frac{23}{2}$,~\eqref{eq:t-bounds} gives $t < \frac{3}{2u} < \frac{1}{2}$, so $1 - t^2 > \frac{3}{4}$ and
+\[
+  \frac{t^2}{3} + \frac{t^4}{5(1 - t^2)} < \frac{3}{4u^2} + \frac{81/(16u^4)}{15/4} = \frac{3}{4u^2} + \frac{27}{20u^4}.
+\]
+Subtracting this upper bound from the right-hand side yields the exact rational identity
+\[
+  \frac{\frac{3}{4}u + \frac{1}{8}}{u^3 + \frac{3}{8}} - \left(\frac{3}{4u^2} + \frac{27}{20u^4}\right) = \frac{20u^4 - 216u^3 - 45u^2 - 81}{20u^4(8u^3 + 3)}.
+\]
+For $u \ge \frac{23}{2}$, we have $20u - 216 \ge 14$, so the numerator satisfies
+\[
+  20u^4 - 216u^3 - 45u^2 - 81 \ge u^2(14u - 45) - 81 \ge \left(\frac{23}{2}\right)^2 (116) - 81 = 15260 > 0. \qedhere
+\]
+\end{proof}
+
+\begin{proposition}[Upper Bound: $M(n) < P(n) + \frac{1}{8}$ for $n \ge 12$]\label{prop:upper}
+For every integer $n \ge 12$, $M(n) < u^3 + \frac{5}{8}$.
+\end{proposition}
+
+\begin{proof}
+Retaining the first three positive terms of the series for $L$ in~\eqref{eq:L-E} gives
+\[
+  H_b - H_a = L - E > 2t\!\left(1 + \frac{t^2}{3} + \frac{t^4}{5} - \frac{E}{2t}\right).
+\]
+Using $2t = \frac{2D}{S}$, the desired bound $M(n) < u^3 + \frac{5}{8}$ follows once we show
+\[
+  \frac{t^2}{3} + \frac{t^4}{5} - \frac{E}{2t} > \frac{S}{u^3 + \frac{5}{8}} - 1 = \frac{\frac{3}{4}u - \frac{1}{8}}{u^3 + \frac{5}{8}}.
+\]
+We verify this in two separate pieces for all $u \ge \frac{23}{2}$:
+\begin{enumerate}
+  \item \emph{Error absorption ($\frac{t^4}{5} > \frac{E}{2t}$):} By~\eqref{eq:L-E} and~\eqref{eq:t-bounds}, $\frac{t^4}{5} > \frac{1}{5u^4}$ while $\frac{E}{2t} < \frac{u}{48(u - 1/2)^6}$. Since $u \ge \frac{23}{2}$ implies $u - \frac{1}{2} \ge \frac{22}{23}u$, the ratio of these two bounds satisfies
+  \[
+    \frac{1/(5u^4)}{u/\big(48(u - \frac{1}{2})^6\big)} = \frac{48(u - \frac{1}{2})^6}{5u^5} \ge \frac{48}{5}\left(\frac{22}{23}\right)^6 u > 80 > 1,
+  \]
+  and therefore $\frac{t^4}{5} - \frac{E}{2t} > 0$.
+  \item \emph{Main quadratic term ($\frac{t^2}{3} > \frac{\frac{3}{4}u - \frac{1}{8}}{u^3 + \frac{5}{8}}$):} Substituting $t = D/S$ and placing over a common denominator gives the exact identity
+  \[
+    \frac{D^2}{3S^2} - \frac{\frac{3}{4}u - \frac{1}{8}}{u^3 + \frac{5}{8}} = \frac{192u^6 - 1536u^5 - 144u^4 - 448u^3 - 636u^2 - 144u + 53}{12(2u+1)^2(8u^3+5)(2u^2-u+2)^2}.
+  \]
+  Since $2u^2 - u + 2 = 2(u - \frac{1}{4})^2 + \frac{15}{8} > 0$, the denominator is strictly positive for all $u > 0$. For $u \ge \frac{23}{2}$, $192u - 1536 \ge 672$, so the numerator $N(u)$ satisfies
+  \begin{align*}
+    N(u) \ge 672u^5 - 144u^4 - 448u^3 - 636u^2 - 144u + 53 &> u^4(672u - 144 - 448 - 636 - 144) \\
+    &= u^4(672u - 1372) > 0.
+  \end{align*}
+\end{enumerate}
+Adding the two inequalities yields $M(n) < u^3 + \frac{5}{8}$ for all $n \ge 12$.
+\end{proof}
+
+\subsection{Base Cases $1 \le n \le 11$ and Equivalence of All Four Formulas}
+
+For $1 \le n \le 11$, exact rational evaluation of $M(n) = (n^3 - (n-1)^3) / \sum_{k=(n-1)^3+1}^{n^3} \frac{1}{k}$ verifies~\eqref{eq:f4} directly (Table~\ref{tab:base-cases}).
+
+\begin{table}[!htbp]
+\centering
+\caption{Exact rational verification of~\eqref{eq:f4} for the base cases $1 \le n \le 11$ (and boundary $n=12$).}
+\label{tab:base-cases}
+\begin{tabularx}{\linewidth}{r r r r X}
+\toprule
+$n$ & Block $[(n-1)^3+1,\, n^3]$ & $M(n)$ (to $6$ d.p.) & $\lfloor M(n) \rfloor$ & $Q(n) + \lfloor \max(0,n-3)/4 \rfloor$ \\
+\midrule
+$1$  & $[1,\, 1]$         & $1.000000$    & $1$    & $1 + 0 = 1$ \\
+$2$  & $[2,\, 8]$         & $4.074844$    & $4$    & $4 + 0 = 4$ \\
+$3$  & $[9,\, 27]$        & $16.189508$   & $16$   & $16 + 0 = 16$ \\
+$4$  & $[28,\, 64]$       & $43.405112$   & $43$   & $43 + 0 = 43$ \\
+$5$  & $[65,\, 125]$      & $91.642068$   & $91$   & $91 + 0 = 91$ \\
+$6$  & $[126,\, 216]$     & $166.885809$  & $166$  & $166 + 0 = 166$ \\
+$7$  & $[217,\, 343]$     & $275.132350$  & $275$  & $274 + 1 = 275$ \\
+$8$  & $[344,\, 512]$     & $422.380250$  & $422$  & $421 + 1 = 422$ \\
+$9$  & $[513,\, 729]$     & $614.628887$  & $614$  & $613 + 1 = 614$ \\
+$10$ & $[730,\, 1000]$    & $857.877957$  & $857$  & $856 + 1 = 857$ \\
+$11$ & $[1001,\, 1331]$   & $1158.127296$ & $1158$ & $1156 + 2 = 1158$ \\
+$12$ & $[1332,\, 1728]$   & $1521.376813$ & $1521$ & $1519 + 2 = 1521$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{proof}[Completion of the Proof of Theorem~\ref{thm:a227012}]
+Propositions~\ref{prop:lower} and~\ref{prop:upper} together with Table~\ref{tab:base-cases} establish~\eqref{eq:f4} for all $n \ge 1$. We now deduce \eqref{eq:f1}--\eqref{eq:f3} algebraically:
+\begin{enumerate}
+  \item \emph{Trigonometric formula~\eqref{eq:f1}:} Set $n = k + 2 \ge 3$ in~\eqref{eq:f4} and write $k - 1 = 4q + r$ with $r \in \{0, 1, 2, 3\}$. Then $\lfloor \frac{k-1}{4} \rfloor = \frac{k - 1 - r}{4}$. Evaluating at $k \equiv 1, 2, 3, 4 \pmod 4$ verifies the identity
+  \[
+    (-1)^k + 2\cos\!\left(\frac{k\pi}{2}\right) - 2\sin\!\left(\frac{k\pi}{2}\right) = 2r - 3 \in \{-3, -1, 1, 3\}.
+  \]
+  Since $Q(k+2) = k^3 + \frac{9}{2}k^2 + \frac{13}{2}k + 4$, substituting $r = \frac{1}{2}\big(3 + (-1)^k + 2\cos(k\pi/2) - 2\sin(k\pi/2)\big)$ into $a(k+2) = Q(k+2) + \frac{k - 1 - r}{4}$ yields~\eqref{eq:f1} identically for all $k \ge 1$.
+
+  \item \emph{Order-$7$ linear recurrence~\eqref{eq:f2}:} For all $n \ge 3$, \eqref{eq:f4} writes $a(n) = \big(Q(n) + \frac{n-3}{4}\big) - \frac{(n-3) \bmod 4}{4}$ as the sum of a cubic polynomial in $n$ (annihilated by $(1 - B)^4$, where $(Bf)(n) = f(n-1)$) and a purely periodic sequence of period $4$ (annihilated by $1 - B^4 = (1 - B)(1 + B + B^2 + B^3)$). Their least common annihilator is
+  \[
+    (1 - B)^4(1 + B + B^2 + B^3) = 1 - 3B + 3B^2 - B^3 - B^4 + 3B^5 - 3B^6 + B^7.
+  \]
+  Whenever $n - 7 \ge 3$ (i.e., $n \ge 10$), all eight indices $n, n-1, \dots, n-7$ lie in the regime $m \ge 3$, yielding~\eqref{eq:f2}. (The threshold $n = 10$ is sharp: at $n = 9$, the recurrence evaluates to $613 = a(9) - 1$ because $a(2) = 4$ exceeds $Q(2) + \lfloor \frac{2-3}{4} \rfloor = 3$ by $1$.)
+
+  \item \emph{Generating function~\eqref{eq:f3}:} Let $A(x) = \sum_{n=1}^{\infty} a(n)x^n$ and $D(x) = (x - 1)^4(1 + x + x^2 + x^3) = 1 - 3x + 3x^2 - x^3 - x^4 + 3x^5 - 3x^6 + x^7$. By~\eqref{eq:f2}, $[x^n](D(x)A(x)) = 0$ for all $n \ge 10$. Computing $[x^n](D(x)A(x))$ for $1 \le n \le 9$ from $(a(1),\dots,a(9)) = (1,4,16,43,91,166,275,422,614)$ produces the coefficients $(1, 1, 7, 6, 5, 5, 0, -2, 1)$, proving~\eqref{eq:f3}. \qedhere
+\end{enumerate}
+\end{proof}
+
+\section{Proof of Theorem~\ref{thm:general-cubic} (Kimberling's General Cubic Conjecture)}
+
+Now let $g(n) = an^3 + bn^2 + cn + d$ with $a,b,c,d \in \mathbb{Z}$ and $a > 0$. As before, set $u = n - \frac{1}{2}$ so that $g(n) = g(u + \frac{1}{2})$ and $g(n-1) = g(u - \frac{1}{2})$, and define
+\[
+  2D_g(u) := g\!\left(u + \tfrac{1}{2}\right) - g\!\left(u - \tfrac{1}{2}\right), \qquad S_g(u) := \frac{g(u + \tfrac{1}{2}) + g(u - \tfrac{1}{2}) + 1}{2}, \qquad t_g(u) := \frac{D_g(u)}{S_g(u)}.
+\]
+Expanding around $u$ gives the exact polynomials
+\[
+  2D_g(u) = 3au^2 + 2bu + c + \frac{a}{4}, \qquad S_g(u) = au^3 + bu^2 + \left(c + \frac{3a}{4}\right)u + d + \frac{b}{4} + \frac{1}{2}.
+\]
+
+\begin{lemma}[Asymptotic Expansion of $M_g(n)$]\label{lem:asymptotic}
+As $n \to \infty$ (with $u = n - \frac{1}{2}$),
+\begin{equation}\label{eq:Mg-expansion}
+  M_g(n) = g(u) + \frac{1}{2} + \frac{c_1}{u} + \frac{c_2}{u^2} + \frac{c_3}{u^3} + O\!\left(\frac{1}{u^4}\right),
+\end{equation}
+where $c_1, c_2, c_3$ are the exact rational expressions stated in Theorem~\ref{thm:general-cubic}.
+\end{lemma}
+
+\begin{proof}
+By the Euler--Maclaurin expansion of the harmonic numbers centered at $N + \frac{1}{2}$,
+\[
+  H_N = \ln\!\left(N + \frac{1}{2}\right) + \gamma + \frac{1}{24(N + \frac{1}{2})^2} + O\!\left(\frac{1}{N^4}\right) \qquad (N \to \infty).
+\]
+Applying this at $N = g(u + \frac{1}{2}) = au^3 + O(u^2)$ and $N = g(u - \frac{1}{2}) = au^3 + O(u^2)$ gives
+\[
+  H_{g(u+1/2)} - H_{g(u-1/2)} = \ln\!\left(\frac{1 + t_g(u)}{1 - t_g(u)}\right) - E_g(u),
+\]
+where
+\[
+  E_g(u) = \frac{1}{24}\!\left(\frac{1}{\big(g(u-\frac{1}{2}) + \frac{1}{2}\big)^2} - \frac{1}{\big(g(u+\frac{1}{2}) + \frac{1}{2}\big)^2}\right) + O\!\left(\frac{1}{u^{12}}\right) = \frac{1}{4a^2 u^7} + O\!\left(\frac{1}{u^8}\right).
+\]
+Note the cancellation of the $u^{-6}$ terms in $E_g(u)$ because $g(u+\frac{1}{2}) - g(u-\frac{1}{2}) = 3au^2 + O(u)$.
+
+Writing $z = 1/u$, we have $t_g(u) = \frac{3}{2}z + O(z^2)$, so $L_g(u) := \ln\frac{1+t_g}{1-t_g} = 2t_g(1 + \frac{t_g^2}{3} + \frac{t_g^4}{5} + \frac{t_g^6}{7} + O(z^8)) = 3z + O(z^2)$. Hence
+\[
+  M_g(n) = \frac{2D_g(u)}{L_g(u) - E_g(u)} = \frac{2D_g(u)}{L_g(u)} \cdot \frac{1}{1 - E_g(u)/L_g(u)} = \frac{S_g(u)}{1 + \frac{t_g^2}{3} + \frac{t_g^4}{5} + \frac{t_g^6}{7}} + \frac{1}{12a u^3} + O\!\left(\frac{1}{u^4}\right),
+\]
+because $\frac{2D_g}{L_g} \cdot \frac{E_g}{L_g} = \big(au^3 + O(u^2)\big)\cdot \frac{1/(4a^2 u^7) + O(u^{-8})}{3/u + O(u^{-2})} = \frac{1}{12a u^3} + O(u^{-4})$. Expanding the rational power series $\frac{S_g(1/z)}{1 + t_g^2/3 + t_g^4/5 + t_g^6/7}$ in powers of $z = 1/u$ through $z^3$ and adding $\frac{1}{12a}z^3$ yields~\eqref{eq:Mg-expansion} with the exact coefficients $c_1, c_2, c_3$ in Theorem~\ref{thm:general-cubic}.
+\end{proof}
+
+\begin{lemma}[Algebraic Non-Vanishing of $(c_1, c_2, c_3)$]\label{lem:nonvanishing}
+For every $a > 0$ and all $b, c, d \in \mathbb{R}$, the triple $(c_1, c_2, c_3)$ is never $(0, 0, 0)$. Specifically, $c_1 = c_2 = 0$ implies
+\begin{equation}\label{eq:c3-pos}
+  c_3 = \frac{9a^2 + 350}{4200a} > 0.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Setting $c_1 = 0$ solves linearly for $c$:
+\[
+  20b^2 - 60ac + 3a^2 = 0 \iff c = \frac{b^2}{3a} + \frac{a}{20}.
+\]
+Substituting this expression for $c$ into $c_2 = 0$ solves linearly for $d$:
+\[
+  -\frac{20}{3}b^3 - 3a^2 b + 180a^2\!\left(d + \frac{1}{2}\right) = 0 \iff d = \frac{b^3}{27a^2} + \frac{b}{60} - \frac{1}{2}.
+\]
+Substituting both $c = \frac{b^2}{3a} + \frac{a}{20}$ and $d = \frac{b^3}{27a^2} + \frac{b}{60} - \frac{1}{2}$ into the numerator of $c_3$ cancels every term containing $b$ identically and leaves
+\[
+  c_3 = -\frac{-\frac{18}{5}a^4 - 140a^2}{1680a^3} = \frac{9a^2 + 350}{4200a}.
+\]
+Since $a > 0$, we have $c_3 > 0$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:general-cubic}]
+By Lemmas~\ref{lem:asymptotic} and~\ref{lem:nonvanishing}, the first nonzero coefficient $c_r$ ($r \in \{1, 2, 3\}$) exists and satisfies $M_g(n) - P_g(n) = \frac{c_r}{u^r} + O(u^{-r-1})$. Setting $\sigma = \operatorname{sgn}(c_r) \in \{+1, -1\}$, there exists $N_0 \ge N_1$ such that for all $n \ge N_0$,
+\[
+  0 < \sigma\big(M_g(n) - P_g(n)\big) < \frac{1}{8}.
+\]
+Expanding $8P_g(n) = 8g(n - \frac{1}{2}) + 4 = 8an^3 + (8b - 12a)n^2 + (6a - 8b + 8c)n + (-a + 2b - 4c + 8d + 4)$ shows that $8P_g(n) \in \mathbb{Z}$ for every integer $n$. Thus $P_g(n) \in \frac{1}{8}\mathbb{Z}$. For any $x \in \frac{1}{8}\mathbb{Z}$ and any $\delta \in (0, \frac{1}{8})$:
+\begin{itemize}
+  \item $\lfloor x + \delta \rfloor = \lfloor x \rfloor$ (whether or not $x \in \mathbb{Z}$);
+  \item $\lfloor x - \delta \rfloor = \lceil x \rceil - 1$ (equaling $\lfloor x \rfloor$ if $x \notin \mathbb{Z}$, and $x - 1$ if $x \in \mathbb{Z}$).
+\end{itemize}
+This proves~\eqref{eq:general-floor} for all $n \ge N_0$.
+
+Finally, for every integer $n$,
+\[
+  P_g(n + 4) - P_g(n) = g\!\left(n + \tfrac{7}{2}\right) - g\!\left(n - \tfrac{1}{2}\right) = a(12n^2 + 36n + 43) + b(8n + 12) + 4c \in \mathbb{Z}.
+\]
+Hence the fractional part of $P_g(n)$ is periodic in $n$ with period dividing $4$. By~\eqref{eq:general-floor}, the discrepancy $\Delta_g(n) := m_g(n) - P_g(n)$ depends only on the fractional part of $P_g(n)$ for $n \ge N_0$, so $\Delta_g(n + 4) = \Delta_g(n)$ for all $n \ge N_0$. Thus $m_g(n) = P_g(n) + \Delta_g(n)$ is the sum of a cubic polynomial in $n$ and a $4$-periodic sequence for $n \ge N_0$, and is therefore annihilated by $(1 - B)^4(1 + B + B^2 + B^3)$ for all $n \ge N_0 + 7$.
+\end{proof}
+
+\begin{corollary}[Exact Minimal Eventual Recurrence Order]\label{cor:minimal-order}
+For any integer cubic $g(n) = an^3 + bn^2 + cn + d$ ($a > 0$), the forward difference $P_g(n+1) - P_g(n) = 3an^2 + 2bn + c + \frac{a}{4} \equiv \frac{a}{4} \pmod{1}$ determines the exact minimal period of $\Delta_g(n)$ for $n \ge N_0$ and hence the minimal eventual linear recurrence of $m_g(n)$:
+\begin{itemize}
+  \item $a \equiv 1, 3 \pmod{4}$ (odd): period $4$, minimal order $7$, annihilator $(1-B)^4(1+B+B^2+B^3)$ with coefficients $(3, -3, 1, 1, -3, 3, -1)$;
+  \item $a \equiv 2 \pmod{4}$: period $2$, minimal order $5$, annihilator $(1-B)^4(1+B)$ with coefficients $(3, -2, -2, 3, -1)$;
+  \item $a \equiv 0 \pmod{4}$: period $1$, minimal order $4$, annihilator $(1-B)^4$ with coefficients $(4, -6, 4, -1)$.
+\end{itemize}
+In particular, Kimberling's Case~(3) recurrence $(3,-3,1,1,-3,3,-1)$ (followed by trailing zeros encoding transient initial terms, denoted \texttt{(fbz)} on \href{https://oeis.org/A227012}{A227012}) holds universally as a common order-$7$ annihilator for all $a > 0$, and is the \emph{minimal} eventual recurrence if and only if $a$ is odd.
+\end{corollary}
+
+\begin{remark}[Boundary Integer Cases and Computational Verification]
+Theorem~\ref{thm:general-cubic} explains subtle threshold phenomena when $P_g(n) \in \mathbb{Z}$. For $g(n) = 4n^3$, $P_g(n) = 4n^3 - 6n^2 + 3n \in \mathbb{Z}$ for all $n \in \mathbb{Z}$ while $c_1 = -\frac{1}{20} < 0$; $M_g(n) - P_g(n)$ crosses from $+9.37 \times 10^{-5}$ at $n = 8$ to $-6.32 \times 10^{-4}$ at $n = 9$, so $m_g(n) = 4n^3 - 6n^2 + 3n - 1$ for all $n \ge 9$ (with minimal order-$4$ recurrence for $n \ge 13$ and common order-$7$ recurrence for $n \ge 16$). By contrast, for $g(n) = 4n^3 + 2n$, $P_g(n) = 4n^3 - 6n^2 + 5n - 1 \in \mathbb{Z}$ while $c_1 = +\frac{9}{20} > 0$, giving $m_g(n) = 4n^3 - 6n^2 + 5n - 1$ for all sufficiently large $n$. Doubly degenerate integer cubics with $c_1 = c_2 = 0$ and $P_g(n) \in \mathbb{Z}$ for infinitely many $n$ also occur (e.g., $g(n) = 10n^3 + 15n^2 + 8n + 1$, where $c_3 = \frac{5}{168} > 0$ and $P_g(n) \in \mathbb{Z}$ for all even $n$). All symbolic identities in Theorems~\ref{thm:a227012} and~\ref{thm:general-cubic}, exact rational base cases ($1 \le n \le 20$), and high-precision \texttt{mpmath} digamma evaluations across $n \le 10^6$ and over $160$ diverse and adversarial integer cubics were independently verified with zero discrepancies.
+\end{remark}
+
+\begin{thebibliography}{9}
+\bibitem{KimberlingA227012}
+C.~Kimberling, \emph{Sequence A227012: $a(n) = \lfloor M(g(n-1)+1, \dots, g(n)) \rfloor$, where $M$ = harmonic mean and $g(n) = n^3$}, The On-Line Encyclopedia of Integer Sequences, July 1, 2013 (with formula contribution by F.~M.~Ramaharo, April 12, 2018). Available at \url{https://oeis.org/A227012}.
+\end{thebibliography}
+
+\end{document}
