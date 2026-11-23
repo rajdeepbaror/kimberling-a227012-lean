@@ -33,7 +33,7 @@ All 12 exported theorems compile cleanly under `leanprover/lean4:v4.37.0-rc1` wi
 Requires [elan](https://github.com/leanprover/elan) (the Lean 4 toolchain manager).
 
 ```bash
-git clone [https://github.com/rajdeepbaror/kimberling-a227012-lean.git](https://github.com/rajdeepbaror/kimberling-a227012-lean.git)
+git clone https://github.com/rajdeepbaror/kimberling-a227012-lean.git
 cd kimberling-a227012-lean
 lake exe cache get
 lake build
