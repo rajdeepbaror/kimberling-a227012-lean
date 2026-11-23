@@ -1,0 +1,29 @@
+name: Lean Action CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+      - name: Verify zero sorrys and standard axioms only
+        run: |
+          OUT=$(lake env lean A227012.lean && lake env lean GeneralCubic.lean)
+          echo "$OUT"
+          if echo "$OUT" | grep -qE "sorryAx|Lean\.ofReduceBool|Lean\.trustCompiler"; then
+            echo "ERROR: Non-standard axiom detected!"
+            exit 1
+          fi
+          COUNT=$(echo "$OUT" | grep -c "depends on axioms: \[propext, Classical.choice, Quot.sound\]")
+          echo "Verified standard-axiom theorems: $COUNT"
+          test "$COUNT" -eq 12
